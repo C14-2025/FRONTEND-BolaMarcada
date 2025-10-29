@@ -1,9 +1,9 @@
 "use client";
 
-import SearchBar from "@/app/components/fields_inputs/searchBar";
-import Navbar from "@/app/components/layout/navbar";
-import Subtitle from "@/app/components/text/subtitle";
-import Title from "@/app/components/text/title";
+import SearchBar from "../../fields_inputs/searchBar";
+import Navbar from "../../layout/navbar";
+import Subtitle from "../../text/subtitle";
+import Title from "../../text/title";
 
 export const HomeSection = () => {
   const videos = [
