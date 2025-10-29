@@ -1,28 +1,20 @@
 "use client";
 
-import Navbar from "../../layout/navbar";
-import SearchBar from "../../fields_inputs/searchBar";
-import Subtitle from "../../text/subtitle";
-import Title from "../../text/title";
+import SearchBar from "@/app/components/fields_inputs/searchBar";
+import Navbar from "@/app/components/layout/navbar";
+import Subtitle from "@/app/components/text/subtitle";
+import Title from "@/app/components/text/title";
 
 export const HomeSection = () => {
   const videos = [
     "/videos/bask1.mp4",
     "/videos/bask2.mp4",
-    "/videos/bask3.mp4",
-    "/videos/bask4.mp4",
     "/videos/fut1.mp4",
     "/videos/fut2.mp4",
-    "/videos/fut3.mp4",
-    "/videos/fut4.mp4",
     "/videos/tenis1.mp4",
     "/videos/tenis2.mp4",
-    "/videos/tenis3.mp4",
-    "/videos/tenis4.mp4",
     "/videos/volei1.mp4",
     "/videos/volei2.mp4",
-    "/videos/volei3.mp4",
-    "/videos/volei4.mp4",
   ];
   const videoSelected = videos[Math.floor(Math.random() * videos.length)];
   return (

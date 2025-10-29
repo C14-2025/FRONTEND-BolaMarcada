@@ -1,10 +1,10 @@
 "use client";
 
+import PrimaryButton from "@/app/components/button/primaryButton";
+import InputField from "@/app/components/fields_inputs/inputField";
+import Title from "@/app/components/text/title";
 import Image from "next/image";
-import InputField from "../../fields_inputs/inputField";
-import PrimaryButton from "../../button/primaryButton";
 import Link from "next/link";
-import Title from "../../text/title";
 
 export default function LoginSignUp() {
   const videos = [
