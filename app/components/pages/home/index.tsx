@@ -1,11 +1,30 @@
 "use client";
 
 import Navbar from "../../layout/navbar";
-import SearchBar from "../../search/searchBar";
+import SearchBar from "../../fields_inputs/searchBar";
 import Subtitle from "../../text/subtitle";
 import Title from "../../text/title";
 
 export const HomeSection = () => {
+  const videos = [
+    "/videos/bask1.mp4",
+    "/videos/bask2.mp4",
+    "/videos/bask3.mp4",
+    "/videos/bask4.mp4",
+    "/videos/fut1.mp4",
+    "/videos/fut2.mp4",
+    "/videos/fut3.mp4",
+    "/videos/fut4.mp4",
+    "/videos/tenis1.mp4",
+    "/videos/tenis2.mp4",
+    "/videos/tenis3.mp4",
+    "/videos/tenis4.mp4",
+    "/videos/volei1.mp4",
+    "/videos/volei2.mp4",
+    "/videos/volei3.mp4",
+    "/videos/volei4.mp4",
+  ];
+  const videoSelected = videos[Math.floor(Math.random() * videos.length)];
   return (
     <section className="relative flex flex-col justify-center items-center min-h-screen text-white overflow-hidden">
       {/* Vídeo de fundo com blur */}
@@ -15,9 +34,9 @@ export const HomeSection = () => {
           loop
           muted
           playsInline
-          className="w-full h-full object-cover scale-105 blur-[8px]"
+          className="absolute top-0 left-0 w-full h-full object-cover blur-[8px]"
         >
-          <source src="/images/vidioFundo.mp4" type="video/mp4" />
+          <source src={videoSelected} type="video/mp4" />
           Seu navegador não suporta vídeos em HTML5.
         </video>
       </div>

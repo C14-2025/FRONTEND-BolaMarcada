@@ -4,18 +4,23 @@ interface TitleProps {
   firstLine: string;
   secondLine?: string;
   align?: "left" | "center" | "right";
+  size?: string;
+  lineHeight?: string;
 }
 
 export default function Title({
   firstLine,
   secondLine,
   align = "right",
+  size = "120px",
+  lineHeight = "100px",
 }: TitleProps) {
   return (
     <h1
-      className={`font-bebas text-white text-[120px] leading-[100px] text-${align} tracking-[2px]`}
+      className={`font-bebas text-white text-${align} tracking-[2px]`}
       style={{
-        lineHeight: "1.1",
+        fontSize: size,
+        lineHeight: lineHeight,
         letterSpacing: "0.05em",
       }}
     >
