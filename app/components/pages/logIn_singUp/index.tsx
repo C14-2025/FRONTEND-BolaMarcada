@@ -1,12 +1,17 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import Title from "../../text/title";
 import InputField from "../../fields_inputs/inputField";
 import PrimaryButton from "../../button/primaryButton";
+import { registerUser, loginUser } from "../../../utils/api";
 
 export default function LoginSignUp() {
+  const router = useRouter();
+
   const videos = [
     "/videos/bask1.mp4",
     "/videos/bask2.mp4",
@@ -18,8 +23,71 @@ export default function LoginSignUp() {
     "/videos/volei2.mp4",
   ];
   const videoSelected = videos[Math.floor(Math.random() * videos.length)];
+
+  const [signup, setSignup] = useState({
+    name: "",
+    email: "",
+    password: "",
+    cpf: "",
+  });
+
+  const [signin, setSignin] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [mensagem, setMensagem] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Atualiza campos
+  const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSignup({ ...signup, [e.target.name]: e.target.value });
+
+  const handleSigninChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSignin({ ...signin, [e.target.name]: e.target.value });
+
+  // Criar conta
+  const handleSignup = async () => {
+    try {
+      setLoading(true);
+      setMensagem("");
+      await registerUser(signup);
+
+      // Login automático após o signup
+      const loginResponse = await loginUser({
+        email: signup.email,
+        password: signup.password,
+      });
+
+      localStorage.setItem("token", loginResponse.access_token);
+      setMensagem("Conta criada com sucesso!");
+      router.push("/user-test");
+    } catch (err: any) {
+      setMensagem("Erro ao criar conta: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Login
+  const handleSignin = async () => {
+    try {
+      setLoading(true);
+      setMensagem("");
+      const response = await loginUser(signin);
+      localStorage.setItem("token", response.access_token);
+      setMensagem("Login realizado com sucesso!");
+      router.push("/user-test");
+    } catch (err: any) {
+      setMensagem("Erro ao entrar: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="relative flex flex-col justify-center items-center min-h-screen text-white">
+      {/* Vídeo de fundo */}
       <video
         autoPlay
         loop
@@ -28,26 +96,18 @@ export default function LoginSignUp() {
         className="absolute top-0 left-0 w-full h-full object-cover blur-[8px]"
       >
         <source src={videoSelected} type="video/mp4" />
-        Seu navegador não suporta vídeos em HTML5.
       </video>
 
-      {/* Overlay escuro */}
       <div className="absolute inset-0 bg-black/60"></div>
-
-      {/* Fundo com o campo proporcional (altura reduzida) */}
       <div
         className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-center bg-no-repeat bg-contain h-[80vh]"
-        style={{
-          backgroundImage: "url('/images/campo_fundo.jpeg')",
-        }}
+        style={{ backgroundImage: "url('/images/campo_fundo.jpeg')" }}
       ></div>
-
-      {/* Leve overlay pra contraste */}
       <div className="absolute inset-0 bg-black/20"></div>
 
-      {/* Conteúdo central */}
+      {/* Conteúdo principal */}
       <div className="relative z-10 flex items-center justify-center w-[1600px] max-w-[95vw] h-[900px] max-h-[85vh]">
-        {/* Círculo central com logo */}
+        {/* Logo central */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center">
           <Link
             href="/"
@@ -75,30 +135,80 @@ export default function LoginSignUp() {
           />
 
           <div className="flex flex-col w-[65%] space-y-4 backdrop-blur-md bg-white/10 p-6 rounded-lg shadow-lg">
-            <InputField label="Nome" />
-            <InputField label="E-mail" type="email" />
-            <InputField label="Senha" type="password" />
-            <InputField label="CPF" />
-            <PrimaryButton label="CRIAR CONTA" />
+            <InputField
+              label="Nome"
+              name="name"
+              value={signup.name}
+              onChange={handleSignupChange}
+            />
+            <InputField
+              label="E-mail"
+              name="email"
+              type="email"
+              value={signup.email}
+              onChange={handleSignupChange}
+            />
+            <InputField
+              label="Senha"
+              name="password"
+              type="password"
+              value={signup.password}
+              onChange={handleSignupChange}
+            />
+            <InputField
+              label="CPF"
+              name="cpf"
+              value={signup.cpf}
+              onChange={handleSignupChange}
+            />
+            <PrimaryButton
+              label={loading ? "Criando..." : "CRIAR CONTA"}
+              onClick={handleSignup}
+            />
           </div>
         </div>
 
         {/* Entrar */}
         <div className="flex flex-col w-1/2 items-center justify-center px-12">
           <Title
-            firstLine="Entrar"
+            firstLine="ENTRAR"
             align="left"
             size="86px"
             lineHeight="60px"
           />
 
           <div className="flex flex-col w-[65%] space-y-4 backdrop-blur-md bg-white/10 p-6 rounded-lg shadow-lg">
-            <InputField label="E-mail" type="email" />
-            <InputField label="Senha" type="password" />
-            <PrimaryButton label="ENTRAR" />
+            <InputField
+              label="E-mail"
+              name="email"
+              type="email"
+              value={signin.email}
+              onChange={handleSigninChange}
+            />
+            <InputField
+              label="Senha"
+              name="password"
+              type="password"
+              value={signin.password}
+              onChange={handleSigninChange}
+            />
+            <PrimaryButton
+              label={loading ? "Entrando..." : "ENTRAR"}
+              onClick={handleSignin}
+            />
           </div>
         </div>
       </div>
+
+      {mensagem && (
+        <p
+          className={`absolute bottom-10 text-center font-semibold ${
+            mensagem.includes("sucesso") ? "text-green-400" : "text-red-400"
+          }`}
+        >
+          {mensagem}
+        </p>
+      )}
     </section>
   );
 }
