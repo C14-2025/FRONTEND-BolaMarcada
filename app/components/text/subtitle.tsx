@@ -4,8 +4,10 @@ interface SubtitleProps {
   firstLine: string;
   secondLine?: string;
   align?: "left" | "center" | "right";
-  size?: string;
+  size?: number | string;
   lineHeight?: string;
+  color?: string;
+  font?: string;
 }
 
 export default function Subtitle({
@@ -14,6 +16,7 @@ export default function Subtitle({
   align = "center",
   size = "28px",
   lineHeight = "1.4",
+  color = "FFFFFF",
 }: SubtitleProps) {
   return (
     <p
@@ -21,6 +24,7 @@ export default function Subtitle({
       style={{
         fontSize: size,
         lineHeight: lineHeight,
+        color,
       }}
     >
       {firstLine}

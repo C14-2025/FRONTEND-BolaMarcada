@@ -61,7 +61,7 @@ export default function LoginSignUp() {
 
       localStorage.setItem("token", loginResponse.access_token);
       setMensagem("Conta criada com sucesso!");
-      router.push("/user-test");
+      router.push("rotas/profile");
     } catch (err: any) {
       setMensagem("Erro ao criar conta: " + err.message);
     } finally {
@@ -77,7 +77,7 @@ export default function LoginSignUp() {
       const response = await loginUser(signin);
       localStorage.setItem("token", response.access_token);
       setMensagem("Login realizado com sucesso!");
-      router.push("/user-test");
+      router.push("/rotas/profile");
     } catch (err: any) {
       setMensagem("Erro ao entrar: " + err.message);
     } finally {
@@ -130,7 +130,7 @@ export default function LoginSignUp() {
           <Title
             firstLine="CRIAR CONTA"
             align="left"
-            size="86px"
+            size="56px"
             lineHeight="60px"
           />
 
@@ -164,6 +164,9 @@ export default function LoginSignUp() {
             <PrimaryButton
               label={loading ? "Criando..." : "CRIAR CONTA"}
               onClick={handleSignup}
+              color="#D9D9D9"
+              hoverColor="#C5C5C5"
+              textColor="#1C1A0D"
             />
           </div>
         </div>
@@ -173,7 +176,7 @@ export default function LoginSignUp() {
           <Title
             firstLine="ENTRAR"
             align="left"
-            size="86px"
+            size="56px"
             lineHeight="60px"
           />
 
@@ -195,6 +198,9 @@ export default function LoginSignUp() {
             <PrimaryButton
               label={loading ? "Entrando..." : "ENTRAR"}
               onClick={handleSignin}
+              color="#D9D9D9"
+              hoverColor="#C5C5C5"
+              textColor="#1C1A0D"
             />
           </div>
         </div>
