@@ -17,7 +17,6 @@ export const HomeSection = () => {
     try {
       setLoading(true);
       const results = await getSportsCentersByCity(city);
-      // Guarda resultados localmente (ou em contexto global futuramente)
       localStorage.setItem("cityResults", JSON.stringify(results));
       localStorage.setItem("searchedCity", city);
       router.push("/resultados");
@@ -39,10 +38,12 @@ export const HomeSection = () => {
     "/videos/volei1.mp4",
     "/videos/volei2.mp4",
   ];
+
   const videoSelected = videos[Math.floor(Math.random() * videos.length)];
 
   return (
     <section className="relative flex flex-col justify-center items-center min-h-screen text-white overflow-hidden">
+      {/* Background Video */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
         <video
           autoPlay
@@ -56,26 +57,46 @@ export const HomeSection = () => {
         </video>
       </div>
 
+      {/* Overlay escura */}
       <div className="absolute inset-0 bg-black/60"></div>
 
-      <div className="w-full">
+      {/* Navbar */}
+      <div className="w-full z-20">
         <Navbar />
       </div>
 
-      <div className="relative z-10 flex flex-col items-end text-right px-10 max-w-[1100px] w-full mt-32">
-        <Title
-          firstLine="ENCONTRE SEU CAMPO"
-          secondLine="PERFEITO"
-          align="right"
-        />
-        <Subtitle
-          firstLine="Reserve seu horário no campo mais próximo de"
-          secondLine="você e jogue sem preocupações!"
-          align="right"
-        />
+      {/* Conteúdo */}
+      <div
+        className="
+          relative z-10 flex flex-col 
+          items-end text-right 
+          px-6 md:px-10 
+          max-w-[1100px] w-full 
+          mt-24 md:mt-32
+        "
+      >
+        {/* Títulos - responsivo */}
+        <div
+          className="w-full flex flex-col items-end md:items-end text-right md:text-right
+                        items-center text-center md:text-right md:items-end
+        "
+        >
+          <Title
+            firstLine="ENCONTRE SEU CAMPO"
+            secondLine="PERFEITO"
+            align="right"
+          />
 
-        <div className="mt-12 w-full flex justify-end">
-          <div className="w-[1072px]">
+          <Subtitle
+            firstLine="Reserve seu horário no campo mais próximo de"
+            secondLine="você e jogue sem preocupações!"
+            align="right"
+          />
+        </div>
+
+        {/* SearchBar Responsivo */}
+        <div className="mt-10 w-full flex justify-center md:justify-end">
+          <div className="w-full md:w-[800px] lg:w-[1072px]">
             <SearchBar
               placeholder="DIGITE SUA CIDADE..."
               buttonLabel={loading ? "BUSCANDO..." : "BUSCAR"}

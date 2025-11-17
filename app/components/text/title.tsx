@@ -4,8 +4,10 @@ interface TitleProps {
   firstLine: string;
   secondLine?: string;
   align?: "left" | "center" | "right";
-  size?: string;
+  size?: number | string;
   lineHeight?: string;
+  color?: string;
+  font?: string;
 }
 
 export default function Title({
@@ -14,6 +16,7 @@ export default function Title({
   align = "right",
   size = "120px",
   lineHeight = "100px",
+  color = "FFFFFF",
 }: TitleProps) {
   return (
     <h1
@@ -22,6 +25,7 @@ export default function Title({
         fontSize: size,
         lineHeight: lineHeight,
         letterSpacing: "0.05em",
+        color,
       }}
     >
       {firstLine}

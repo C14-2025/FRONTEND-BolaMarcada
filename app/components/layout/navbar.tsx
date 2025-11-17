@@ -26,7 +26,7 @@ export default function Navbar() {
         <div className="justify-self-end">
           <div className="mb-10">
             <Link
-              href="/login"
+              href="rotas/login"
               className="text-gray-300 hover:text-white font-bebas text-2xl racking-wide leading-none mb-20"
             >
               CADASTRAR / ENTRAR

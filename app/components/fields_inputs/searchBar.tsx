@@ -25,7 +25,7 @@ export default function SearchBar({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`flex items-center justify-between overflow-hidden shadow-lg ${className}`}
+      className={`flex items-center justify-between overflow-hidden ${className}`}
       style={{
         width: "100%",
         height: "107px",
