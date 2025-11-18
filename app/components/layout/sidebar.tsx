@@ -1,56 +1,85 @@
 "use client";
 
 import Link from "next/link";
-import { FiHome, FiSearch, FiHeart } from "react-icons/fi";
+import { useState } from "react";
+import { FiHome, FiSearch, FiHeart, FiMenu } from "react-icons/fi";
 import { IoExitOutline } from "react-icons/io5";
 
 export default function Sidebar() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <aside className="w-64 border-r border-gray-200 bg-white p-8 min-h-screen">
-      <h2 className="text-xl font-bold mb-10">Bola Marcada</h2>
+    <>
+      {/* BOTÃO HAMBÚRGUER - MOBILE */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="md:hidden fixed top-4 left-4 z-[9999] p-2 bg-white rounded-lg shadow-lg"
+      >
+        <FiMenu size={24} className="text-gray-800" />
+      </button>
 
-      <ul className="space-y-6 text-gray-700 font-medium">
-        <li>
-          <Link
-            href="/rotas/home"
-            className="flex items-center gap-3 hover:text-[#EFA23B] hover:bg-[#f4efe8] hover:px-3 hover:py-2 hover:ounded hover:font-semibold"
-          >
-            <FiHome size={18} />
-            Home
-          </Link>
-        </li>
+      {/* SIDEBAR */}
+      <aside
+        className={`fixed md:static top-0 left-0 h-full bg-white border-r border-gray-200 p-8 w-64 transform transition-transform duration-300 z-[999]
+        ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+      `}
+      >
+        <h2 className="text-xl font-bold mb-10">Bola Marcada</h2>
 
-        <li>
-          <Link
-            href="/rotas/explore"
-            className="flex items-center gap-3 hover:text-[#EFA23B] hover:bg-[#f4efe8] hover:px-3 hover:py-2 hover:ounded hover:font-semibold"
-          >
-            <FiSearch size={18} />
-            Explorar
-          </Link>
-        </li>
+        <ul className="space-y-6 text-gray-700 font-medium">
+          <li>
+            <Link
+              href="/rotas/home"
+              className="flex items-center gap-3 px-3 py-2 rounded-md transition-all hover:bg-[#f4efe8] hover:text-[#EFA23B] font-medium"
+              onClick={() => setOpen(false)}
+            >
+              <FiHome size={18} />
+              Home
+            </Link>
+          </li>
 
-        <li>
-          <Link
-            href="/rotas/favorites"
-            className="flex items-center gap-3 hover:text-[#EFA23B] hover:bg-[#f4efe8] hover:px-3 hover:py-2 hover:ounded hover:font-semibold"
-          >
-            <FiHeart size={18} />
-            Favoritos
-          </Link>
-        </li>
+          <li>
+            <Link
+              href="/rotas/explore"
+              className="flex items-center gap-3 px-3 py-2 rounded-md transition-all hover:bg-[#f4efe8] hover:text-[#EFA23B] font-medium"
+              onClick={() => setOpen(false)}
+            >
+              <FiSearch size={18} />
+              Explorar
+            </Link>
+          </li>
 
-        {/* Ativo */}
-        <li>
-          <Link
-            href="/"
-            className="flex items-center gap-3 hover:text-[#EFA23B] hover:bg-[#f4efe8] hover:px-3 hover:py-2 hover:ounded hover:font-semibold"
-          >
-            <IoExitOutline size={18} />
-            Sair
-          </Link>
-        </li>
-      </ul>
-    </aside>
+          <li>
+            <Link
+              href="/rotas/favorites"
+              className="flex items-center gap-3 px-3 py-2 rounded-md transition-all hover:bg-[#f4efe8] hover:text-[#EFA23B] font-medium"
+              onClick={() => setOpen(false)}
+            >
+              <FiHeart size={18} />
+              Favoritos
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              href="/"
+              className="flex items-center gap-3 px-3 py-2 rounded-md transition-all hover:bg-[#f4efe8] hover:text-[#EFA23B] font-medium"
+              onClick={() => setOpen(false)}
+            >
+              <IoExitOutline size={18} />
+              Sair
+            </Link>
+          </li>
+        </ul>
+      </aside>
+
+      {/* FUNDO ESCURO QUANDO O MENU ESTÁ ABERTO (MOBILE) */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm md:hidden z-[998]"
+          onClick={() => setOpen(false)}
+        />
+      )}
+    </>
   );
 }

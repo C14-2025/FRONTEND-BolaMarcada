@@ -22,6 +22,7 @@ export default function LoginSignUp() {
     "/videos/volei1.mp4",
     "/videos/volei2.mp4",
   ];
+
   const videoSelected = videos[Math.floor(Math.random() * videos.length)];
 
   const [signup, setSignup] = useState({
@@ -31,37 +32,38 @@ export default function LoginSignUp() {
     cpf: "",
   });
 
-  const [signin, setSignin] = useState({
-    email: "",
-    password: "",
-  });
+  const [signin, setSignin] = useState({ email: "", password: "" });
 
   const [mensagem, setMensagem] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Atualiza campos
   const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSignup({ ...signup, [e.target.name]: e.target.value });
 
   const handleSigninChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSignin({ ...signin, [e.target.name]: e.target.value });
 
-  // Criar conta
   const handleSignup = async () => {
     try {
       setLoading(true);
-      setMensagem("");
+      setMensagem("Criando conta...");
+
       await registerUser(signup);
 
-      // Login automático após o signup
+      setMensagem("Conta criada com sucesso!");
+
+      // pequeno delay para exibir a mensagem
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
       const loginResponse = await loginUser({
         email: signup.email,
         password: signup.password,
       });
 
       localStorage.setItem("token", loginResponse.access_token);
-      setMensagem("Conta criada com sucesso!");
-      router.push("rotas/profile");
+
+      // redirecionamento correto (versão do branch de testes)
+      router.push("/rotas/profile");
     } catch (err: any) {
       setMensagem("Erro ao criar conta: " + err.message);
     } finally {
@@ -69,12 +71,13 @@ export default function LoginSignUp() {
     }
   };
 
-  // Login
   const handleSignin = async () => {
     try {
       setLoading(true);
-      setMensagem("");
+      setMensagem("Entrando...");
+
       const response = await loginUser(signin);
+
       localStorage.setItem("token", response.access_token);
       setMensagem("Login realizado com sucesso!");
       router.push("/rotas/profile");
@@ -86,7 +89,7 @@ export default function LoginSignUp() {
   };
 
   return (
-    <section className="relative flex flex-col justify-center items-center min-h-screen text-white">
+    <section className="relative flex flex-col justify-center items-center min-h-screen text-white overflow-hidden">
       {/* Vídeo de fundo */}
       <video
         autoPlay
@@ -99,42 +102,43 @@ export default function LoginSignUp() {
       </video>
 
       <div className="absolute inset-0 bg-black/60"></div>
+
       <div
-        className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-center bg-no-repeat bg-contain h-[80vh]"
+        className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-center bg-no-repeat bg-cover md:bg-contain h-[60vh] md:h-[80vh]"
         style={{ backgroundImage: "url('/images/campo_fundo.jpeg')" }}
-      ></div>
+      />
+
       <div className="absolute inset-0 bg-black/20"></div>
 
-      {/* Conteúdo principal */}
-      <div className="relative z-10 flex items-center justify-center w-[1600px] max-w-[95vw] h-[900px] max-h-[85vh]">
-        {/* Logo central */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center">
-          <Link
-            href="/"
-            className="hover:scale-105 transition-transform duration-300"
-          >
-            <div className="w-[230px] h-[230px] flex items-center justify-center mt-10">
-              <Image
-                src="/images/Logo.png"
-                alt="Logo Bola Marcada"
-                width={210}
-                height={294}
-                priority
-              />
-            </div>
-          </Link>
-        </div>
+      {/* ESCUDO */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center pointer-events-auto z-30">
+        <Link
+          href="/"
+          className="hover:scale-105 transition-transform duration-300"
+        >
+          <Image
+            src="/images/Logo.png"
+            alt="Logo Bola Marcada"
+            width={630}
+            height={630}
+            className="w-[250px] h-[250px] md:w-[230px] md:h-[230px] object-contain"
+            priority
+          />
+        </Link>
+      </div>
 
-        {/* Criar conta */}
-        <div className="flex flex-col w-1/2 items-center justify-center px-12">
+      {/* CONTAINER PRINCIPAL */}
+      <div className="relative z-20 flex flex-col md:flex-row items-center justify-center w-full max-w-[1400px] px-6 gap-16 md:gap-0 pt-40 md:pt-0">
+        {/* CRIAR CONTA */}
+        <div className="flex flex-col w-full md:w-1/2 items-center justify-center px-4 md:px-12">
           <Title
             firstLine="CRIAR CONTA"
-            align="left"
-            size="56px"
-            lineHeight="60px"
+            align="center"
+            size="42px"
+            lineHeight="46px"
           />
 
-          <div className="flex flex-col w-[65%] space-y-4 backdrop-blur-md bg-white/10 p-6 rounded-lg shadow-lg">
+          <div className="flex flex-col w-full md:w-[65%] space-y-4 backdrop-blur-md bg-white/10 p-6 rounded-lg shadow-lg mt-6">
             <InputField
               label="Nome"
               name="name"
@@ -161,6 +165,7 @@ export default function LoginSignUp() {
               value={signup.cpf}
               onChange={handleSignupChange}
             />
+
             <PrimaryButton
               label={loading ? "Criando..." : "CRIAR CONTA"}
               onClick={handleSignup}
@@ -171,16 +176,16 @@ export default function LoginSignUp() {
           </div>
         </div>
 
-        {/* Entrar */}
-        <div className="flex flex-col w-1/2 items-center justify-center px-12">
+        {/* ENTRAR */}
+        <div className="flex flex-col w-full md:w-1/2 items-center justify-center px-4 md:px-12">
           <Title
             firstLine="ENTRAR"
-            align="left"
-            size="56px"
-            lineHeight="60px"
+            align="center"
+            size="42px"
+            lineHeight="46px"
           />
 
-          <div className="flex flex-col w-[65%] space-y-4 backdrop-blur-md bg-white/10 p-6 rounded-lg shadow-lg">
+          <div className="flex flex-col w-full md:w-[65%] space-y-4 backdrop-blur-md bg-white/10 p-6 rounded-lg shadow-lg mt-6">
             <InputField
               label="E-mail"
               name="email"
@@ -195,6 +200,7 @@ export default function LoginSignUp() {
               value={signin.password}
               onChange={handleSigninChange}
             />
+
             <PrimaryButton
               label={loading ? "Entrando..." : "ENTRAR"}
               onClick={handleSignin}
@@ -206,14 +212,17 @@ export default function LoginSignUp() {
         </div>
       </div>
 
+      {/* MENSAGEM DE SUCESSO/ERRO */}
       {mensagem && (
-        <p
-          className={`absolute bottom-10 text-center font-semibold ${
-            mensagem.includes("sucesso") ? "text-green-400" : "text-red-400"
-          }`}
-        >
-          {mensagem}
-        </p>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg text-white font-semibold text-center z-[9999] bg-black/70 backdrop-blur-sm shadow-lg max-w-[90vw]">
+          <p
+            className={
+              mensagem.includes("sucesso") ? "text-green-400" : "text-red-400"
+            }
+          >
+            {mensagem}
+          </p>
+        </div>
       )}
     </section>
   );
