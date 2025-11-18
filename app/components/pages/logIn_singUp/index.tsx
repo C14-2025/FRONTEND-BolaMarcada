@@ -80,7 +80,6 @@ export default function LoginSignUp() {
 
       localStorage.setItem("token", response.access_token);
       setMensagem("Login realizado com sucesso!");
-
       router.push("/rotas/profile");
     } catch (err: any) {
       setMensagem("Erro ao entrar: " + err.message);

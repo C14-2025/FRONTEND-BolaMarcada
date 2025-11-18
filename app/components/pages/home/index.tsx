@@ -66,9 +66,21 @@ export const HomeSection = () => {
       </div>
 
       {/* Conteúdo */}
-      <div className="relative z-10 flex flex-col items-end text-right px-6 md:px-10 max-w-[1100px] w-full mt-24 md:mt-32">
-        {/* Títulos */}
-        <div className="w-full flex flex-col items-end text-right md:items-end md:text-right">
+      <div
+        className="
+          relative z-10 flex flex-col 
+          items-end text-right 
+          px-6 md:px-10 
+          max-w-[1100px] w-full 
+          mt-24 md:mt-32
+        "
+      >
+        {/* Títulos - responsivo */}
+        <div
+          className="w-full flex flex-col items-end md:items-end text-right md:text-right
+                        items-center text-center md:text-right md:items-end
+        "
+        >
           <Title
             firstLine="ENCONTRE SEU CAMPO"
             secondLine="PERFEITO"
@@ -82,7 +94,7 @@ export const HomeSection = () => {
           />
         </div>
 
-        {/* SearchBar */}
+        {/* SearchBar Responsivo */}
         <div className="mt-10 w-full flex justify-center md:justify-end">
           <div className="w-full md:w-[800px] lg:w-[1072px]">
             <SearchBar
