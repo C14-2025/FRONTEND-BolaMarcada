@@ -66,21 +66,9 @@ export const HomeSection = () => {
       </div>
 
       {/* Conteúdo */}
-      <div
-        className="
-          relative z-10 flex flex-col 
-          items-end text-right 
-          px-6 md:px-10 
-          max-w-[1100px] w-full 
-          mt-24 md:mt-32
-        "
-      >
+      <div className="relative z-10 flex flex-col items-end text-right px-6 md:px-10 max-w-[1100px] w-full mt-24 md:mt-32">
         {/* Títulos - responsivo */}
-        <div
-          className="w-full flex flex-col items-end md:items-end text-right md:text-right
-                        items-center text-center md:text-right md:items-end
-        "
-        >
+        <div className="w-full flex flex-col items-end md:items-end text-right md:text-right">
           <Title
             firstLine="ENCONTRE SEU CAMPO"
             secondLine="PERFEITO"

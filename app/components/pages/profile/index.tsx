@@ -18,13 +18,10 @@ export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // avatar
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  // editar
   const [isEditing, setIsEditing] = useState(false);
 
-  // campos
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -49,7 +46,6 @@ export default function ProfilePage() {
     })();
   }, []);
 
-  // 📌 MÁSCARA DE TELEFONE
   function formatPhone(value: string) {
     return value
       .replace(/\D/g, "")
@@ -58,30 +54,19 @@ export default function ProfilePage() {
       .slice(0, 15);
   }
 
-  // 📌 ALTERAR FOTO
   function handleAvatarFile(file: File) {
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatarPreview(reader.result as string);
-    };
+    reader.onloadend = () => setAvatarPreview(reader.result as string);
     reader.readAsDataURL(file);
   }
 
-  // 📌 SALVAR PERFIL
   async function handleSave() {
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const body: any = {
-        name,
-        email,
-        phone,
-      };
-
-      if (avatarPreview) {
-        body.avatar = avatarPreview;
-      }
+      const body: any = { name, email, phone };
+      if (avatarPreview) body.avatar = avatarPreview;
 
       const updated = await updateCurrentUser(token, body);
 
@@ -93,7 +78,6 @@ export default function ProfilePage() {
     }
   }
 
-  // 📌 DELETAR CONTA
   async function handleDeleteAccount() {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -116,24 +100,28 @@ export default function ProfilePage() {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen text-lg">
         Carregando...
       </div>
     );
 
   return (
-    <div className="flex bg-[#fffaf2] min-h-screen text-gray-800">
-      <Sidebar />
+    <div className="flex flex-col md:flex-row bg-[#fffaf2] min-h-screen text-gray-800">
+      {/* SIDEBAR RESPONSIVA */}
+      <div className=" md:block">
+        <Sidebar />
+      </div>
 
-      <main className="flex-1 px-20 py-12 flex justify-center">
+      {/* Conteúdo */}
+      <main className="flex-1 w-full px-6 sm:px-10 md:px-20 py-10 flex justify-center">
         <div className="w-full max-w-[700px]">
-          {/* TÍTULO */}
-          <div className="mb-12">
+          {/* Título */}
+          <div className="mb-10">
             <Title firstLine="Perfil" align="left" size={32} color="#1C1A0D" />
           </div>
 
-          {/* AVATAR */}
-          <div className="flex justify-center mb-16">
+          {/* Avatar */}
+          <div className="flex justify-center mb-12">
             <Avatar
               name={user?.name}
               email={user?.email}
@@ -142,12 +130,12 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* MINHAS RESERVAS */}
+          {/* Minhas Reservas */}
           <section className="mb-10">
             <Title
               firstLine="Minhas Reservas"
               align="left"
-              size={32}
+              size={28}
               color="#1C1A0D"
             />
             <Subtitle
@@ -158,17 +146,16 @@ export default function ProfilePage() {
             />
           </section>
 
-          {/* CONFIGURAÇÕES */}
+          {/* Configurações */}
           <section className="mb-10">
             <Title
               firstLine="Configurações da Conta"
               align="left"
-              size={32}
+              size={28}
               color="#1C1A0D"
             />
 
-            <div className="space-y-6 ">
-              {/* NOME */}
+            <div className="space-y-5 mt-6">
               <input
                 placeholder="Nome completo"
                 value={name}
@@ -179,7 +166,6 @@ export default function ProfilePage() {
                 }`}
               />
 
-              {/* EMAIL */}
               <input
                 placeholder="Seu e-mail"
                 value={email}
@@ -190,7 +176,6 @@ export default function ProfilePage() {
                 }`}
               />
 
-              {/* TELEFONE */}
               <input
                 placeholder="Telefone"
                 value={phone}
@@ -201,13 +186,13 @@ export default function ProfilePage() {
                 }`}
               />
 
-              {/* BOTÕES */}
-              <div className="flex gap-4 mt-4">
+              {/* Botões editar/salvar */}
+              <div className="flex flex-col sm:flex-row gap-4 mt-4">
                 {!isEditing && (
                   <PrimaryButton
                     label="Editar"
                     onClick={() => setIsEditing(true)}
-                    className="w-32"
+                    className="w-full sm:w-32"
                     color="#D9D9D9"
                     hoverColor="#C5C5C5"
                     textColor="#1C1A0D"
@@ -225,7 +210,7 @@ export default function ProfilePage() {
                         setPhone(user.phone || "");
                         setAvatarPreview(user.avatar || null);
                       }}
-                      className="w-32"
+                      className="w-full sm:w-32"
                       color="#D9D9D9"
                       hoverColor="#C5C5C5"
                       textColor="#1C1A0D"
@@ -234,7 +219,7 @@ export default function ProfilePage() {
                     <PrimaryButton
                       label="Salvar"
                       onClick={handleSave}
-                      className="w-32"
+                      className="w-full sm:w-32"
                       color="#EFA23B"
                       hoverColor="#d78c2f"
                       textColor="white"
@@ -245,16 +230,16 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          {/* SEGURANÇA */}
+          {/* Segurança */}
           <section className="mb-12">
             <Title
               firstLine="Segurança"
               align="left"
-              size={32}
+              size={28}
               color="#1C1A0D"
             />
 
-            <div className="space-y-3">
+            <div className="space-y-4 mt-4">
               <div>
                 <Subtitle
                   firstLine="Alterar Senha"
@@ -262,11 +247,10 @@ export default function ProfilePage() {
                   align="left"
                   color="#1C1A0D"
                 />
-
                 <PrimaryButton
                   label="Alterar Senha"
                   onClick={() => {}}
-                  className="w-40 mt-2"
+                  className="w-full sm:w-40 mt-2"
                   color="#EFA23B"
                   hoverColor="#d78c2f"
                   textColor="white"
@@ -276,7 +260,7 @@ export default function ProfilePage() {
               <div className="pt-4">
                 <Title
                   firstLine="Excluir Conta"
-                  size={32}
+                  size={28}
                   align="left"
                   color="#1C1A0D"
                 />
@@ -284,7 +268,7 @@ export default function ProfilePage() {
                 <PrimaryButton
                   label="Deletar Conta"
                   onClick={handleDeleteAccount}
-                  className="w-40 mt-6"
+                  className="w-full sm:w-40 mt-6"
                   color="#E53935"
                   hoverColor="#C62828"
                   textColor="white"
