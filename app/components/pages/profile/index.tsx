@@ -19,9 +19,9 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-
   const [isEditing, setIsEditing] = useState(false);
 
+  // campos
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -46,6 +46,7 @@ export default function ProfilePage() {
     })();
   }, []);
 
+  // máscara telefone
   function formatPhone(value: string) {
     return value
       .replace(/\D/g, "")
@@ -54,12 +55,14 @@ export default function ProfilePage() {
       .slice(0, 15);
   }
 
+  // alterar avatar
   function handleAvatarFile(file: File) {
     const reader = new FileReader();
     reader.onloadend = () => setAvatarPreview(reader.result as string);
     reader.readAsDataURL(file);
   }
 
+  // salvar perfil
   async function handleSave() {
     try {
       const token = localStorage.getItem("token");
@@ -78,6 +81,7 @@ export default function ProfilePage() {
     }
   }
 
+  // deletar conta
   async function handleDeleteAccount() {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -107,20 +111,20 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col md:flex-row bg-[#fffaf2] min-h-screen text-gray-800">
-      {/* SIDEBAR RESPONSIVA */}
-      <div className=" md:block">
+      {/* SIDEBAR */}
+      <div className="md:block">
         <Sidebar />
       </div>
 
       {/* Conteúdo */}
       <main className="flex-1 w-full px-6 sm:px-10 md:px-20 py-10 flex justify-center">
         <div className="w-full max-w-[700px]">
-          {/* Título */}
+          {/* título */}
           <div className="mb-10">
             <Title firstLine="Perfil" align="left" size={32} color="#1C1A0D" />
           </div>
 
-          {/* Avatar */}
+          {/* avatar */}
           <div className="flex justify-center mb-12">
             <Avatar
               name={user?.name}
@@ -130,7 +134,7 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* Minhas Reservas */}
+          {/* Minhas reservas */}
           <section className="mb-10">
             <Title
               firstLine="Minhas Reservas"
@@ -186,7 +190,7 @@ export default function ProfilePage() {
                 }`}
               />
 
-              {/* Botões editar/salvar */}
+              {/* botões */}
               <div className="flex flex-col sm:flex-row gap-4 mt-4">
                 {!isEditing && (
                   <PrimaryButton

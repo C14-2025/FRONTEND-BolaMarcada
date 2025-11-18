@@ -31,7 +31,9 @@ export default function LoginSignUp() {
     password: "",
     cpf: "",
   });
+
   const [signin, setSignin] = useState({ email: "", password: "" });
+
   const [mensagem, setMensagem] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -50,6 +52,7 @@ export default function LoginSignUp() {
 
       setMensagem("Conta criada com sucesso!");
 
+      // pequeno delay para exibir a mensagem
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
       const loginResponse = await loginUser({
@@ -59,7 +62,7 @@ export default function LoginSignUp() {
 
       localStorage.setItem("token", loginResponse.access_token);
 
-      // Redireciona após exibir mensagem
+      // redirecionamento correto (versão do branch de testes)
       router.push("/rotas/profile");
     } catch (err: any) {
       setMensagem("Erro ao criar conta: " + err.message);
@@ -77,6 +80,7 @@ export default function LoginSignUp() {
 
       localStorage.setItem("token", response.access_token);
       setMensagem("Login realizado com sucesso!");
+
       router.push("/rotas/profile");
     } catch (err: any) {
       setMensagem("Erro ao entrar: " + err.message);
@@ -87,6 +91,7 @@ export default function LoginSignUp() {
 
   return (
     <section className="relative flex flex-col justify-center items-center min-h-screen text-white overflow-hidden">
+      {/* Vídeo de fundo */}
       <video
         autoPlay
         loop
@@ -102,11 +107,11 @@ export default function LoginSignUp() {
       <div
         className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-center bg-no-repeat bg-cover md:bg-contain h-[60vh] md:h-[80vh]"
         style={{ backgroundImage: "url('/images/campo_fundo.jpeg')" }}
-      ></div>
+      />
 
       <div className="absolute inset-0 bg-black/20"></div>
 
-      {/* ESCUDO RESTAURADO */}
+      {/* ESCUDO */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center pointer-events-auto z-30">
         <Link
           href="/"

@@ -20,9 +20,9 @@ export default function Sidebar() {
 
       {/* SIDEBAR */}
       <aside
-        className={`fixed md:static top-0 left-0 h-full bg-white border-r border-gray-200 p-8 w-64 transform transition-transform duration-300 z-[999] 
-          ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}
+        className={`fixed md:static top-0 left-0 h-full bg-white border-r border-gray-200 p-8 w-64 transform transition-transform duration-300 z-[999]
+        ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+      `}
       >
         <h2 className="text-xl font-bold mb-10">Bola Marcada</h2>
 
