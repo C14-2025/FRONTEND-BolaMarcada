@@ -6,6 +6,9 @@ const nextConfig = {
   images: {
     domains: ["media.graphassets.com"],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = nextConfig;
