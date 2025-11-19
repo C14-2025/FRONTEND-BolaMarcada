@@ -2,60 +2,60 @@
 
 ```yaml
 - generic [active] [ref=e1]:
-  - alert [ref=e2]
-  - generic [ref=e3]:
-    - complementary [ref=e5]:
-      - heading "Bola Marcada" [level=2] [ref=e6]
-      - list [ref=e7]:
-        - listitem [ref=e8]:
-          - link "Home" [ref=e9] [cursor=pointer]:
-            - /url: /rotas/home
-            - img [ref=e10]
-            - text: Home
-        - listitem [ref=e13]:
-          - link "Explorar" [ref=e14] [cursor=pointer]:
-            - /url: /rotas/explore
-            - img [ref=e15]
-            - text: Explorar
-        - listitem [ref=e18]:
-          - link "Favoritos" [ref=e19] [cursor=pointer]:
-            - /url: /rotas/favorites
-            - img [ref=e20]
-            - text: Favoritos
-        - listitem [ref=e22]:
-          - link "Sair" [ref=e23] [cursor=pointer]:
-            - /url: /
-            - img [ref=e24]
-            - text: Sair
-    - main [ref=e26]:
-      - generic [ref=e27]:
-        - heading "Perfil" [level=1] [ref=e29]
-        - generic [ref=e31]:
-          - generic [ref=e32]:
-            - img [ref=e33]
-            - button [ref=e34] [cursor=pointer]:
-              - img [ref=e35]
-          - paragraph [ref=e38]: Nome Atualizado Teste
-          - paragraph [ref=e39]: usuarioValido1@teste.com.br
-        - generic [ref=e40]:
-          - heading "Minhas Reservas" [level=1] [ref=e41]
-          - paragraph [ref=e42]: Você ainda não possui reservas.
-        - generic [ref=e43]:
-          - heading "Configurações da Conta" [level=1] [ref=e44]
-          - generic [ref=e45]:
-            - textbox "Nome completo" [ref=e46]: Nome Atualizado Teste
-            - textbox "Seu e-mail" [ref=e47]: usuarioValido1@teste.com.br
-            - textbox "Telefone" [ref=e48]: (31) 99999-8888
-            - generic [ref=e49]:
-              - button "Cancelar" [ref=e50] [cursor=pointer]
-              - button "Salvar" [ref=e51] [cursor=pointer]
-        - generic [ref=e52]:
-          - heading "Segurança" [level=1] [ref=e53]
-          - generic [ref=e54]:
-            - generic [ref=e55]:
-              - paragraph [ref=e56]: Alterar Senha
-              - button "Alterar Senha" [ref=e57] [cursor=pointer]
-            - generic [ref=e58]:
-              - heading "Excluir Conta" [level=1] [ref=e59]
-              - button "Deletar Conta" [ref=e60] [cursor=pointer]
+    - alert [ref=e2]
+    - generic [ref=e3]:
+        - complementary [ref=e5]:
+            - heading "Bola Marcada" [level=2] [ref=e6]
+            - list [ref=e7]:
+                - listitem [ref=e8]:
+                    - link "Home" [ref=e9] [cursor=pointer]:
+                        - /url: /rotas/home
+                        - img [ref=e10]
+                        - text: Home
+                - listitem [ref=e13]:
+                    - link "Explorar" [ref=e14] [cursor=pointer]:
+                        - /url: /rotas/explore
+                        - img [ref=e15]
+                        - text: Explorar
+                - listitem [ref=e18]:
+                    - link "Favoritos" [ref=e19] [cursor=pointer]:
+                        - /url: /rotas/favorites
+                        - img [ref=e20]
+                        - text: Favoritos
+                - listitem [ref=e22]:
+                    - link "Sair" [ref=e23] [cursor=pointer]:
+                        - /url: /
+                        - img [ref=e24]
+                        - text: Sair
+        - main [ref=e26]:
+            - generic [ref=e27]:
+                - heading "Perfil" [level=1] [ref=e29]
+                - generic [ref=e31]:
+                    - generic [ref=e32]:
+                        - img [ref=e33]
+                        - button [ref=e34] [cursor=pointer]:
+                            - img [ref=e35]
+                    - paragraph [ref=e38]: Nome Atualizado Teste
+                    - paragraph [ref=e39]: usuarioValido1@teste.com.br
+                - generic [ref=e40]:
+                    - heading "Minhas Reservas" [level=1] [ref=e41]
+                    - paragraph [ref=e42]: Você ainda não possui reservas.
+                - generic [ref=e43]:
+                    - heading "Configurações da Conta" [level=1] [ref=e44]
+                    - generic [ref=e45]:
+                        - textbox "Nome completo" [ref=e46]: Nome Atualizado Teste
+                        - textbox "Seu e-mail" [ref=e47]: usuarioValido1@teste.com.br
+                        - textbox "Telefone" [ref=e48]: (31) 99999-8888
+                        - generic [ref=e49]:
+                            - button "Cancelar" [ref=e50] [cursor=pointer]
+                            - button "Salvar" [ref=e51] [cursor=pointer]
+                - generic [ref=e52]:
+                    - heading "Segurança" [level=1] [ref=e53]
+                    - generic [ref=e54]:
+                        - generic [ref=e55]:
+                            - paragraph [ref=e56]: Alterar Senha
+                            - button "Alterar Senha" [ref=e57] [cursor=pointer]
+                        - generic [ref=e58]:
+                            - heading "Excluir Conta" [level=1] [ref=e59]
+                            - button "Deletar Conta" [ref=e60] [cursor=pointer]
 ```
