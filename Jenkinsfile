@@ -28,10 +28,14 @@ pipeline {
                 echo "🟦 Baixando Node $NODE_VERSION..."
 
                 sh '''
-                    echo "📥 Instalando Node localmente no workspace..."
+                    echo "📥 Preparando ambiente..."
+
+                    # Instalar xz-utils para extrair .tar.xz
+                    apt-get update && apt-get install -y xz-utils
+
+                    echo "📥 Instalando Node localmente..."
 
                     if [ -d "$NODE_HOME" ]; then
-                        echo "🔄 Removendo Node antigo..."
                         rm -rf $NODE_HOME
                     fi
 
@@ -39,15 +43,17 @@ pipeline {
 
                     NODE_VERSION_FULL="${NODE_VERSION}.0.0"
 
+                    # Baixar Node
                     curl -fsSL https://nodejs.org/dist/v$NODE_VERSION_FULL/node-v$NODE_VERSION_FULL-linux-x64.tar.xz -o node.tar.xz
 
+                    # Extrair Node
                     tar -xf node.tar.xz -C $NODE_HOME --strip-components=1
                     rm node.tar.xz
 
-                    echo "✔️ Node instalado em $NODE_HOME"
+                    echo "✔️ Node instalado com sucesso!"
                     node -v
                     npm -v
-                    '''
+                '''
             }
         }
 
