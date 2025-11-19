@@ -9,7 +9,7 @@ pipeline {
 
         stage('Clonar repositório') {
             steps {
-                git branch: 'main', url: 'https://github.com/SEU_USUARIO/SEU_REPO.git'
+                git branch: 'main', url: 'https://github.com/C14-2025/FRONTEND-BolaMarcada.git'
             }
         }
 
