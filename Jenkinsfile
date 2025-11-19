@@ -1,8 +1,9 @@
 pipeline {
-    agent any
-
-    tools {
-        nodejs "NodeJS"
+    agent {
+        docker {
+            image 'node:20'
+            args '-u root'  // garante permissão para instalar libs
+        }
     }
 
     stages {
