@@ -37,15 +37,17 @@ pipeline {
 
                     mkdir -p $NODE_HOME
 
-                    curl -fsSL https://nodejs.org/dist/v$NODE_VERSION.0/node-v$NODE_VERSION.0-linux-x64.tar.xz -o node.tar.xz
-                    tar -xf node.tar.xz -C $NODE_HOME --strip-components=1
+                    NODE_VERSION_FULL="${NODE_VERSION}.0.0"
 
+                    curl -fsSL https://nodejs.org/dist/v$NODE_VERSION_FULL/node-v$NODE_VERSION_FULL-linux-x64.tar.xz -o node.tar.xz
+
+                    tar -xf node.tar.xz -C $NODE_HOME --strip-components=1
                     rm node.tar.xz
 
                     echo "✔️ Node instalado em $NODE_HOME"
                     node -v
                     npm -v
-                '''
+                    '''
             }
         }
 
