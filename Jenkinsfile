@@ -90,7 +90,7 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 echo "📦 Armazenando artefatos do build e relatórios..."
-                archiveArtifacts artifacts: 'dist/*.whl, dist/*.tar.gz, tests/**/report*.xml, reports/**/*.html', fingerprint: true
+                archiveArtifacts artifacts: '.next/**', fingerprint: true
             }
         }
     }
