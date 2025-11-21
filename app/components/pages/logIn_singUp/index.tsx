@@ -44,6 +44,22 @@ export default function LoginSignUp() {
     setSignin({ ...signin, [e.target.name]: e.target.value });
 
   const handleSignup = async () => {
+    // Validações
+    if (!signup.name || !signup.email || !signup.password || !signup.cpf) {
+      setMensagem("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    if (signup.cpf.replace(/\D/g, "").length !== 11) {
+      setMensagem("CPF deve conter 11 dígitos.");
+      return;
+    }
+
+    if (signup.password.length < 6) {
+      setMensagem("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+
     try {
       setLoading(true);
       setMensagem("Criando conta...");
@@ -62,10 +78,24 @@ export default function LoginSignUp() {
 
       localStorage.setItem("token", loginResponse.access_token);
 
-      // redirecionamento correto (versão do branch de testes)
-      router.push("/rotas/profile");
+      // redirecionar para página principal após cadastro
+      router.push("/");
     } catch (err: any) {
-      setMensagem("Erro ao criar conta: " + err.message);
+      console.error("Erro completo:", err);
+      
+      let errorMessage = "Erro desconhecido ao criar conta";
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err?.detail) {
+        errorMessage = typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail);
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+      
+      setMensagem("Erro ao criar conta: " + errorMessage);
     } finally {
       setLoading(false);
     }
@@ -80,7 +110,7 @@ export default function LoginSignUp() {
 
       localStorage.setItem("token", response.access_token);
       setMensagem("Login realizado com sucesso!");
-      router.push("/rotas/profile");
+      router.push("/");
     } catch (err: any) {
       setMensagem("Erro ao entrar: " + err.message);
     } finally {

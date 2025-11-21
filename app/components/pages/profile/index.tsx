@@ -5,6 +5,7 @@ import {
   deleteUser,
   getCurrentUser,
   updateCurrentUser,
+  getFields,
 } from "../../../utils/api";
 
 import Sidebar from "../../layout/sidebar";
@@ -17,6 +18,7 @@ import PrimaryButton from "../../button/primaryButton";
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [userFields, setUserFields] = useState<any[]>([]);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -38,6 +40,31 @@ export default function ProfilePage() {
         setEmail(data.email);
         setPhone(data.phone || "");
         setAvatarPreview(data.avatar || null);
+        
+        // Buscar campos do usuário
+        try {
+          // Primeiro tenta buscar do backend
+          const allFields = await getFields();
+          console.log("Campos do backend:", allFields);
+          // Filtrar campos criados pelo usuário
+          const myFields = allFields.filter((field: any) => field.owner_id === data.id);
+          console.log("Campos filtrados do usuário:", myFields);
+          
+          // Se não encontrou no backend, buscar do localStorage
+          if (myFields.length === 0) {
+            const localFields = JSON.parse(localStorage.getItem("localFields") || "[]");
+            console.log("Campos locais:", localFields);
+            setUserFields(localFields);
+          } else {
+            setUserFields(myFields);
+          }
+        } catch (err) {
+          console.warn("Erro ao buscar campos do backend:", err);
+          // Se backend falhar, buscar do localStorage
+          const localFields = JSON.parse(localStorage.getItem("localFields") || "[]");
+          console.log("Usando campos locais (backend falhou):", localFields);
+          setUserFields(localFields);
+        }
       } catch (err) {
         console.error("Erro ao carregar usuário:", err);
       } finally {
@@ -134,20 +161,62 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* Minhas reservas */}
+          {/* Minhas Instalações */}
           <section className="mb-10">
             <Title
-              firstLine="Minhas Reservas"
+              firstLine="Minhas Instalações"
               align="left"
               size={28}
               color="#1C1A0D"
             />
-            <Subtitle
-              firstLine="Você ainda não possui reservas."
-              align="left"
-              size={16}
-              color="#1C1A0D"
-            />
+            {userFields.length === 0 ? (
+              <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                <Subtitle
+                  firstLine="Você ainda não publicou nenhum campo."
+                  align="center"
+                  size={16}
+                  color="#1C1A0D"
+                />
+                <div className="mt-4">
+                  <a
+                    href="/rotas/cadastrar-campo"
+                    className="inline-block bg-[#EFA23B] hover:bg-[#d78c2f] text-white font-medium px-6 py-2.5 rounded-lg transition-colors duration-200"
+                  >
+                    Cadastrar Primeiro Campo
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 space-y-4">
+                {userFields.map((field) => (
+                  <div
+                    key={field.id}
+                    className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-800">
+                          {field.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {field.address}, {field.city}
+                        </p>
+                        <p className="text-sm text-[#EFA23B] mt-1 font-medium">
+                          {field.sportType}
+                        </p>
+                      </div>
+                      {field.image && (
+                        <img
+                          src={field.image}
+                          alt={field.name}
+                          className="w-20 h-20 object-cover rounded-md ml-4"
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
 
           {/* Configurações */}

@@ -1,7 +1,7 @@
 "use client";
 
 import SearchBar from "../../fields_inputs/searchBar";
-import Navbar from "../../layout/navbar";
+import HomeNavbar from "../../layout/homeNavbar";
 import Subtitle from "../../text/subtitle";
 import Title from "../../text/title";
 import { getSportsCentersByCity } from "../../../utils/api";
@@ -16,10 +16,10 @@ export const HomeSection = () => {
     if (!city.trim()) return alert("Digite o nome de uma cidade.");
     try {
       setLoading(true);
-      const results = await getSportsCentersByCity(city);
-      localStorage.setItem("cityResults", JSON.stringify(results));
+      // Salvar cidade pesquisada para usar nos filtros
       localStorage.setItem("searchedCity", city);
-      router.push("/resultados");
+      // Redirecionar para a página de campos
+      router.push("/rotas/campos");
     } catch (err: any) {
       console.error("Erro ao buscar centros:", err);
       alert(err.message || "Erro ao buscar centros esportivos.");
@@ -62,7 +62,7 @@ export const HomeSection = () => {
 
       {/* Navbar */}
       <div className="w-full z-20">
-        <Navbar />
+        <HomeNavbar />
       </div>
 
       {/* Conteúdo */}

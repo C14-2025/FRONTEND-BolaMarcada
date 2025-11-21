@@ -10,18 +10,43 @@ export async function registerUser(data: {
   password: string;
   cpf: string;
 }) {
-  const response = await fetch(`${API_URL}/users/signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  try {
+    const response = await fetch(`${API_URL}/users/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || "Falha ao registrar usuário.");
+    if (!response.ok) {
+      let errorMessage = "Falha ao registrar usuário.";
+      
+      try {
+        const error = await response.json();
+        console.log("Erro do backend:", error);
+        
+        // Tenta extrair mensagem de várias formas possíveis
+        if (typeof error.detail === 'string') {
+          errorMessage = error.detail;
+        } else if (error.detail && typeof error.detail === 'object') {
+          errorMessage = JSON.stringify(error.detail);
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        }
+      } catch (e) {
+        console.error("Erro ao parsear resposta:", e);
+        errorMessage = `Erro ${response.status}: ${response.statusText}`;
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Erro na requisição:", error);
+    throw error;
   }
-
-  return await response.json();
 }
 
 // Login
@@ -112,4 +137,139 @@ export async function getSportsCentersByCity(cityName: string) {
   }
 
   return await response.json();
+}
+
+//  ROTAS DE CAMPOS
+
+// Criar novo campo
+export async function createField(
+  token: string,
+  data: {
+    name: string;
+    address: string;
+    city: string;
+    sportType: string;
+    description: string;
+    images: string[];
+    schedule: Array<{
+      dayOfWeek: string;
+      startTime: string;
+      endTime: string;
+      price: string;
+    }>;
+  }
+) {
+  const response = await fetch(`${API_URL}/fields`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    const errorMessage = error.detail || error.message || "Falha ao cadastrar campo.";
+    throw new Error(errorMessage);
+  }
+
+  return await response.json();
+}
+
+// Buscar todos os campos
+export async function getFields(filters?: {
+  city?: string;
+  sportType?: string;
+}) {
+  let url = `${API_URL}/fields`;
+  
+  if (filters) {
+    const params = new URLSearchParams();
+    if (filters.city) params.append("city", filters.city);
+    if (filters.sportType) params.append("sportType", filters.sportType);
+    
+    const queryString = params.toString();
+    if (queryString) url += `?${queryString}`;
+  }
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || "Falha ao buscar campos.");
+  }
+
+  return await response.json();
+}
+
+// Buscar campo por ID
+export async function getFieldById(id: string) {
+  const response = await fetch(`${API_URL}/fields/${id}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || "Falha ao buscar campo.");
+  }
+
+  return await response.json();
+}
+
+// Atualizar campo
+export async function updateField(
+  token: string,
+  id: string,
+  data: Partial<{
+    name: string;
+    address: string;
+    city: string;
+    sportType: string;
+    description: string;
+    images: string[];
+    schedule: Array<{
+      dayOfWeek: string;
+      startTime: string;
+      endTime: string;
+      price: string;
+    }>;
+  }>
+) {
+  const response = await fetch(`${API_URL}/fields/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || "Falha ao atualizar campo.");
+  }
+
+  return await response.json();
+}
+
+// Deletar campo
+export async function deleteField(token: string, id: string) {
+  const response = await fetch(`${API_URL}/fields/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || "Falha ao deletar campo.");
+  }
+
+  return true;
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { FiHome, FiSearch, FiHeart, FiMenu } from "react-icons/fi";
+import { FiHome, FiSearch, FiHeart, FiMenu, FiPlusCircle } from "react-icons/fi";
 import { IoExitOutline } from "react-icons/io5";
 
 export default function Sidebar() {
@@ -29,7 +29,7 @@ export default function Sidebar() {
         <ul className="space-y-6 text-gray-700 font-medium">
           <li>
             <Link
-              href="/rotas/home"
+              href="/"
               className="flex items-center gap-3 px-3 py-2 rounded-md transition-all hover:bg-[#f4efe8] hover:text-[#EFA23B] font-medium"
               onClick={() => setOpen(false)}
             >
@@ -40,7 +40,7 @@ export default function Sidebar() {
 
           <li>
             <Link
-              href="/rotas/explore"
+              href="/rotas/campos"
               className="flex items-center gap-3 px-3 py-2 rounded-md transition-all hover:bg-[#f4efe8] hover:text-[#EFA23B] font-medium"
               onClick={() => setOpen(false)}
             >
@@ -51,7 +51,18 @@ export default function Sidebar() {
 
           <li>
             <Link
-              href="/rotas/favorites"
+              href="/rotas/cadastrar-campo"
+              className="flex items-center gap-3 px-3 py-2 rounded-md transition-all hover:bg-[#f4efe8] hover:text-[#EFA23B] font-medium"
+              onClick={() => setOpen(false)}
+            >
+              <FiPlusCircle size={18} />
+              Cadastrar Campo
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              href="/rotas/favoritos"
               className="flex items-center gap-3 px-3 py-2 rounded-md transition-all hover:bg-[#f4efe8] hover:text-[#EFA23B] font-medium"
               onClick={() => setOpen(false)}
             >
