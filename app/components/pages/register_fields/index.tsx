@@ -10,6 +10,7 @@ import ImageUpload from "@/app/components/fields_inputs/imageUpload";
 import AvailabilitySchedule from "@/app/components/fields_inputs/availabilitySchedule";
 import PrimaryButton from "@/app/components/button/primaryButton";
 import { createField } from "@/app/utils/api";
+import { FiChevronLeft } from "react-icons/fi";
 
 interface TimeSlot {
   id: string;
@@ -144,9 +145,9 @@ export default function RegisterFieldsSection() {
         {/* Botão Voltar */}
         <Link
           href="/rotas/profile"
-          className="inline-block mb-6 text-gray-600 hover:text-gray-800 transition-colors"
+          className="inline-flex items-center justify-center w-10 h-10 mb-6 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all z-50 relative"
         >
-          ← Voltar
+          <FiChevronLeft size={24} strokeWidth={2.5} />
         </Link>
 
         {/* Título */}
