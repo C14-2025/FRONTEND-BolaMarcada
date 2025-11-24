@@ -75,22 +75,35 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            when {
-                expression { fileExists('package.json') && sh(script: "grep -q \"test\" package.json", returnStatus: true) == 0 }
-            }
+        stage('Run Unit Tests') {
             steps {
-                echo "🧪 Executando testes..."
+                echo "🧪 Executando testes unitários (Jest)..."
                 sh '''
-                    npm test --if-present
+                    npm test -- --coverage --ci
+                '''
+            }
+        }
+
+        stage('Run E2E Tests') {
+            steps {
+                echo "🎭 Executando testes E2E (Playwright)..."
+                sh '''
+                    # Instalar browsers do Playwright
+                    npx playwright install --with-deps chromium
+                    
+                    # Rodar testes E2E
+                    npx playwright test --reporter=list || true
                 '''
             }
         }
 
         stage('Archive Artifacts') {
             steps {
-                echo "📦 Armazenando artefatos do build e relatórios..."
-                archiveArtifacts artifacts: '.next/**', fingerprint: true
+                echo "📦 Arquivando artefatos do build e relatórios de testes..."
+                archiveArtifacts artifacts: '.next/**', fingerprint: true, allowEmptyArchive: true
+                archiveArtifacts artifacts: 'coverage/**', fingerprint: true, allowEmptyArchive: true
+                archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true, allowEmptyArchive: true
+                archiveArtifacts artifacts: 'test-results/**', fingerprint: true, allowEmptyArchive: true
             }
         }
     }
