@@ -75,17 +75,33 @@ export default function LoginSignUp() {
           password: signup.password,
         });
 
-        localStorage.setItem("token", loginResponse.access_token);
+        localStorage.setItem("token", loginResponse.token);
         
         const userData = {
-          id: loginResponse.user_id || "local-user",
-          name: signup.name,
-          email: signup.email,
-          phone: "",
-          avatar: null,
+          id: loginResponse.user.id || "local-user",
+          name: loginResponse.user.name || signup.name,
+          email: loginResponse.user.email || signup.email,
+          phone: loginResponse.user.phone || "",
+          avatar: loginResponse.user.avatar || null,
         };
         localStorage.setItem("userData", JSON.stringify(userData));
+        
+        // Redirecionar para página principal após cadastro
+        router.push("/");
+        return; // Importante: sair da função aqui
       } catch (backendErr: any) {
+        // Verificar se é erro de rede (backend offline) ou erro de validação
+        const isNetworkError = 
+          backendErr.message?.includes("Failed to fetch") ||
+          backendErr.message?.includes("NetworkError") ||
+          backendErr.message?.includes("fetch") ||
+          !backendErr.message; // Se não tem mensagem, provavelmente é erro de rede
+        
+        if (!isNetworkError) {
+          // É um erro de validação do backend (ex: email já existe)
+          throw backendErr; // Repassar o erro para o catch externo
+        }
+        
         // Backend offline - modo offline
         console.warn("⚠️ Backend offline, criando conta localmente");
         
@@ -120,7 +136,7 @@ export default function LoginSignUp() {
           avatar: null,
         }));
         
-        setMensagem("✅ Conta criada localmente! (Modo Offline)");
+        setMensagem("Conta criada localmente! (Modo Offline)");
         await new Promise((resolve) => setTimeout(resolve, 1500));
       }
 
@@ -162,19 +178,34 @@ export default function LoginSignUp() {
         // Tentar login no backend
         const response = await loginUser(signin);
 
-        localStorage.setItem("token", response.access_token);
+        localStorage.setItem("token", response.token);
         
         const userData = {
-          id: response.user_id || "local-user",
-          name: "",
-          email: signin.email,
-          phone: "",
-          avatar: null,
+          id: response.user.id || "local-user",
+          name: response.user.name || "",
+          email: response.user.email || signin.email,
+          phone: response.user.phone || "",
+          avatar: response.user.avatar || null,
         };
         localStorage.setItem("userData", JSON.stringify(userData));
         
-        setMensagem("✅ Login realizado com sucesso!");
+        setMensagem("Login realizado com sucesso!");
+        
+        router.push("/");
+        return; // Importante: sair da função aqui
       } catch (backendErr: any) {
+        // Verificar se é erro de rede (backend offline) ou erro de validação
+        const isNetworkError = 
+          backendErr.message?.includes("Failed to fetch") ||
+          backendErr.message?.includes("NetworkError") ||
+          backendErr.message?.includes("fetch") ||
+          !backendErr.message;
+        
+        if (!isNetworkError) {
+          // É um erro de validação do backend (ex: senha incorreta)
+          throw backendErr; // Repassar o erro para o catch externo
+        }
+        
         // Backend offline - modo offline
         console.warn("⚠️ Backend offline, fazendo login localmente");
         
@@ -198,11 +229,11 @@ export default function LoginSignUp() {
           avatar: user.avatar || null,
         }));
         
-        setMensagem("✅ Login realizado! (Modo Offline)");
+        setMensagem("Login realizado! (Modo Offline)");
         await new Promise((resolve) => setTimeout(resolve, 1000));
+        
+        router.push("/");
       }
-      
-      router.push("/");
     } catch (err: any) {
       console.error("❌ Erro ao fazer login:", err);
       setMensagem("Erro: " + (err.message || "Falha ao entrar"));

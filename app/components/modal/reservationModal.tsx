@@ -6,11 +6,11 @@ import { FiX, FiCalendar, FiClock, FiDollarSign, FiChevronRight, FiChevronLeft }
 
 interface ReservationModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   fieldId: string;
   fieldName: string;
   availableSlots: TimeSlot[];
-  onConfirm: (reservation: Omit<Reservation, "id" | "createdAt">) => void;
+  onConfirm?: (reservation: Omit<Reservation, "id" | "createdAt">) => void;
 }
 
 type Step = "date" | "time" | "summary";
@@ -189,7 +189,7 @@ export default function ReservationModal({
       status: "confirmed",
     };
 
-    onConfirm(reservation);
+    onConfirm?.(reservation);
   };
 
   return (
@@ -199,7 +199,7 @@ export default function ReservationModal({
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">{fieldName}</h2>
           <button
-            onClick={onClose}
+            onClick={() => onClose?.()}
             className="text-gray-500 hover:text-gray-700 transition-colors"
           >
             <FiX size={24} />

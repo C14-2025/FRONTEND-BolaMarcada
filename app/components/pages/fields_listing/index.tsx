@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Navbar from "@/app/components/layout/navbar";
 import FieldCard from "@/app/components/cards/fieldCard";
 import { FiSearch } from "react-icons/fi";
@@ -103,7 +103,8 @@ export default function FieldsListingSection() {
   };
 
   const filterFields = () => {
-    let result = fields;
+    // Garantir que fields é um array
+    let result = Array.isArray(fields) ? fields : [];
 
     // Filtrar por busca (nome do lugar)
     if (searchTerm) {
@@ -128,13 +129,22 @@ export default function FieldsListingSection() {
   };
 
   // Agrupar campos por tipo de esporte
-  const groupedFields = filteredFields.reduce((acc, field) => {
-    if (!acc[field.sportType]) {
-      acc[field.sportType] = [];
+  const groupedFields = useMemo(() => {
+    // Garantir que é um array
+    const safeFilteredFields = Array.isArray(filteredFields) ? filteredFields : [];
+    
+    if (safeFilteredFields.length === 0) {
+      return {} as Record<string, Field[]>;
     }
-    acc[field.sportType].push(field);
-    return acc;
-  }, {} as Record<string, Field[]>);
+    
+    return safeFilteredFields.reduce((acc, field) => {
+      if (!acc[field.sportType]) {
+        acc[field.sportType] = [];
+      }
+      acc[field.sportType].push(field);
+      return acc;
+    }, {} as Record<string, Field[]>);
+  }, [filteredFields]);
 
   const sportTypeLabels: Record<string, string> = {
     futebol: "Society",
@@ -147,7 +157,7 @@ export default function FieldsListingSection() {
     outros: "Outros",
   };
 
-  const cities = Array.from(new Set(fields.map((f) => f.city)));
+  const cities = Array.from(new Set(Array.isArray(fields) ? fields.map((f) => f.city) : []));
 
   return (
     <div className="min-h-screen bg-gray-50">
