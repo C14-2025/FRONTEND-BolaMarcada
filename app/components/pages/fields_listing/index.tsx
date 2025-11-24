@@ -178,6 +178,7 @@ export default function FieldsListingSection() {
                 <div className="relative">
                   <input
                     type="text"
+                    data-testid="search-input"
                     placeholder="Digite o nome do lugar"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -193,6 +194,7 @@ export default function FieldsListingSection() {
                   Onde
                 </label>
                 <select
+                  data-testid="city-filter"
                   value={selectedCity}
                   onChange={(e) => setSelectedCity(e.target.value)}
                   className="w-full h-[45px] rounded-sm px-3 outline-none text-gray-700 border border-gray-300 focus:ring-2 focus:ring-[#EFA23B] focus:border-transparent transition-all duration-200"
@@ -212,6 +214,7 @@ export default function FieldsListingSection() {
                   Tipo do campo
                 </label>
                 <select
+                  data-testid="sport-filter"
                   value={selectedSport}
                   onChange={(e) => setSelectedSport(e.target.value)}
                   className="w-full h-[45px] rounded-sm px-3 outline-none text-gray-700 border border-gray-300 focus:ring-2 focus:ring-[#EFA23B] focus:border-transparent transition-all duration-200"

@@ -24,7 +24,7 @@ export default function FieldCard({
 }: FieldCardProps) {
   return (
     <Link href={`/rotas/campo/${id}`}>
-      <div className="group cursor-pointer bg-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 h-full">
+      <div data-testid="field-card" className="group cursor-pointer bg-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 h-full">
         {/* Imagem */}
         <div className="relative w-full h-48 bg-gray-300 overflow-hidden">
           {image ? (

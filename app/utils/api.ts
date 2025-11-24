@@ -65,22 +65,48 @@ export async function loginUser(data: { email: string; password: string }) {
   return await response.json();
 }
 
-// Buscar usuário atual
+// Obter dados do usuário atual
 export async function getCurrentUser(token: string) {
-  const response = await fetch(`${API_URL}/users/me`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    const response = await fetch(`${API_URL}/users/me`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || "Falha ao obter dados do usuário.");
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || "Falha ao obter dados do usuário.");
+    }
+
+    const userData = await response.json();
+    
+    // Salvar dados do usuário no localStorage para uso offline
+    localStorage.setItem("userData", JSON.stringify(userData));
+    
+    return userData;
+  } catch (error) {
+    console.warn("Backend não disponível, usando dados locais");
+    
+    // Tentar pegar do localStorage
+    const savedUser = localStorage.getItem("userData");
+    if (savedUser) {
+      return JSON.parse(savedUser);
+    }
+    
+    // Se não tiver no localStorage, criar usuário mockado
+    const mockUser = {
+      id: "local-user",
+      name: "Usuário Local",
+      email: "usuario@local.com",
+      phone: "",
+      avatar: null,
+    };
+    localStorage.setItem("userData", JSON.stringify(mockUser));
+    return mockUser;
   }
-
-  return await response.json();
 }
 
 // Atualizar usuário
@@ -272,4 +298,134 @@ export async function deleteField(token: string, id: string) {
   }
 
   return true;
+}
+
+//  ROTAS DE RESERVAS
+
+// Criar nova reserva
+export async function createReservation(
+  token: string,
+  data: {
+    fieldId: string;
+    date: string;
+    dayOfWeek: string;
+    startTime: string;
+    endTime: string;
+    price: string;
+  }
+) {
+  try {
+    const response = await fetch(`${API_URL}/reservations`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || "Falha ao criar reserva.");
+    }
+
+    const reservation = await response.json();
+    console.log("✅ Reserva criada no backend:", reservation);
+    
+    return reservation;
+  } catch (error) {
+    console.warn("⚠️ Backend não disponível, usando localStorage");
+    
+    // Fallback: salvar no localStorage
+    const localReservation = {
+      id: `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      ...data,
+      status: "confirmed",
+      createdAt: new Date().toISOString(),
+    };
+    
+    const existingReservations = JSON.parse(
+      localStorage.getItem("userReservations") || "[]"
+    );
+    existingReservations.push(localReservation);
+    localStorage.setItem("userReservations", JSON.stringify(existingReservations));
+    
+    console.log("📦 Reserva salva localmente:", localReservation);
+    return localReservation;
+  }
+}
+
+// Obter reservas do usuário
+export async function getUserReservations(token: string) {
+  try {
+    const response = await fetch(`${API_URL}/reservations/me`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Falha ao obter reservas.");
+    }
+
+    const reservations = await response.json();
+    console.log("✅ Reservas do backend:", reservations);
+    
+    // Salvar no localStorage para backup
+    localStorage.setItem("userReservations", JSON.stringify(reservations));
+    
+    return reservations;
+  } catch (error) {
+    console.warn("⚠️ Backend não disponível, usando localStorage");
+    
+    // Fallback: pegar do localStorage
+    const localReservations = localStorage.getItem("userReservations");
+    if (localReservations) {
+      const reservations = JSON.parse(localReservations);
+      console.log("📦 Reservas locais:", reservations);
+      return reservations;
+    }
+    
+    console.log("⚠️ Nenhuma reserva encontrada");
+    return [];
+  }
+}
+
+// Cancelar reserva
+export async function cancelReservation(token: string, id: string) {
+  try {
+    const response = await fetch(`${API_URL}/reservations/${id}/cancel`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || "Falha ao cancelar reserva.");
+    }
+
+    console.log("✅ Reserva cancelada no backend");
+    return await response.json();
+  } catch (error) {
+    console.warn("⚠️ Backend não disponível, cancelando localmente");
+    
+    // Fallback: cancelar no localStorage
+    const localReservations = JSON.parse(
+      localStorage.getItem("userReservations") || "[]"
+    );
+    
+    const updatedReservations = localReservations.map((r: any) =>
+      r.id === id ? { ...r, status: "cancelled" } : r
+    );
+    
+    localStorage.setItem("userReservations", JSON.stringify(updatedReservations));
+    console.log("📦 Reserva cancelada localmente");
+    
+    return { success: true };
+  }
 }

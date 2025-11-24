@@ -6,6 +6,8 @@ import Link from "next/link";
 import Navbar from "@/app/components/layout/navbar";
 import { getFieldById } from "@/app/utils/api";
 import { FiMapPin, FiClock, FiDollarSign, FiChevronLeft } from "react-icons/fi";
+import ReservationModal from "@/app/components/modal/reservationModal";
+import { Reservation, TimeSlot as ReservationTimeSlot } from "@/app/types/reservation";
 
 interface TimeSlot {
   id: string;
@@ -46,6 +48,54 @@ export default function FieldDetailsSection({ fieldId }: FieldDetailsProps) {
   const [field, setField] = useState<Field | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleReserveClick = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Você precisa estar logado para fazer uma reserva!");
+      router.push("/rotas/login");
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmReservation = (reservation: Omit<Reservation, "id" | "createdAt">) => {
+    const newReservation: Reservation = {
+      ...reservation,
+      id: `res-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Salvar no localStorage
+    const existingReservations = JSON.parse(
+      localStorage.getItem("userReservations") || "[]"
+    ) as Reservation[];
+
+    // Verificar se já existe reserva para esse horário e data
+    const isDuplicate = existingReservations.some(
+      (r) =>
+        r.fieldId === newReservation.fieldId &&
+        r.date === newReservation.date &&
+        r.startTime === newReservation.startTime &&
+        r.status === "confirmed"
+    );
+
+    if (isDuplicate) {
+      alert("Você já tem uma reserva para este horário!");
+      return;
+    }
+
+    existingReservations.push(newReservation);
+    localStorage.setItem("userReservations", JSON.stringify(existingReservations));
+
+    console.log("✅ Reserva criada:", newReservation);
+
+    setIsModalOpen(false);
+
+    // Redirecionar para página de confirmação
+    router.push(`/rotas/reserva/confirmacao?id=${newReservation.id}`);
+  };
 
   useEffect(() => {
     fetchFieldDetails();
@@ -209,43 +259,33 @@ export default function FieldDetailsSection({ fieldId }: FieldDetailsProps) {
               </thead>
               <tbody>
                 {field.schedule && field.schedule.length > 0 ? (
-                  field.schedule.map((slot) => (
+                  field.schedule
+                    .filter((slot) => slot.isOpen)
+                    .map((slot) => (
                     <tr
                       key={slot.id}
-                      className={`border-b border-gray-200 ${
-                        slot.isOpen ? "" : "bg-gray-50"
-                      }`}
+                      className="border-b border-gray-200"
                     >
                       <td className="py-4 px-4 text-gray-800 font-medium">
                         {daysOfWeek[slot.dayOfWeek] || slot.dayOfWeek}
                       </td>
                       <td className="py-4 px-4">
-                        {slot.isOpen ? (
-                          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                            Aberto
-                          </span>
-                        ) : (
-                          <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
-                            Fechado
-                          </span>
-                        )}
+                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                          Disponível
+                        </span>
                       </td>
                       <td className="py-4 px-4 text-gray-700">
-                        {slot.isOpen && slot.startTime && slot.endTime
-                          ? `${slot.startTime} - ${slot.endTime}`
-                          : "-"}
+                        {slot.startTime} - {slot.endTime}
                       </td>
                       <td className="py-4 px-4 text-[#EFA23B] font-semibold">
-                        {slot.isOpen && slot.price
-                          ? `R$ ${parseFloat(slot.price).toFixed(2)}`
-                          : "-"}
+                        R$ {parseFloat(slot.price).toFixed(2)}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan={4} className="py-8 text-center text-gray-500">
-                      Nenhuma informação de horário disponível
+                      Nenhum horário disponível no momento
                     </td>
                   </tr>
                 )}
@@ -254,13 +294,26 @@ export default function FieldDetailsSection({ fieldId }: FieldDetailsProps) {
           </div>
         </div>
 
-        {/* Botão de Contato ou Reserva (futuro) */}
+        {/* Botão de Reservar Centralizado */}
         <div className="mt-8 text-center">
-          <button className="bg-[#EFA23B] hover:bg-[#d78c2f] text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200">
-            Reservar um horário
+          <button
+            onClick={handleReserveClick}
+            className="bg-[#EFA23B] hover:bg-[#d78c2f] text-white font-semibold px-12 py-4 rounded-lg transition-colors duration-200 text-lg shadow-md hover:shadow-lg"
+          >
+            Reservar um Horário
           </button>
         </div>
       </main>
+
+      {/* Modal de Reserva */}
+      <ReservationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        fieldId={field.id}
+        fieldName={field.name}
+        availableSlots={field.schedule.filter((slot) => slot.isOpen)}
+        onConfirm={handleConfirmReservation}
+      />
     </div>
   );
 }

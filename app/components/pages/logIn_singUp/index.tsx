@@ -64,24 +64,70 @@ export default function LoginSignUp() {
       setLoading(true);
       setMensagem("Criando conta...");
 
-      await registerUser(signup);
+      try {
+        // Tentar criar conta no backend
+        await registerUser(signup);
+        setMensagem("Conta criada com sucesso!");
+        await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      setMensagem("Conta criada com sucesso!");
+        const loginResponse = await loginUser({
+          email: signup.email,
+          password: signup.password,
+        });
 
-      // pequeno delay para exibir a mensagem
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+        localStorage.setItem("token", loginResponse.access_token);
+        
+        const userData = {
+          id: loginResponse.user_id || "local-user",
+          name: signup.name,
+          email: signup.email,
+          phone: "",
+          avatar: null,
+        };
+        localStorage.setItem("userData", JSON.stringify(userData));
+      } catch (backendErr: any) {
+        // Backend offline - modo offline
+        console.warn("⚠️ Backend offline, criando conta localmente");
+        
+        // Verificar se já existe usuário com esse email
+        const existingUsers = JSON.parse(localStorage.getItem("offlineUsers") || "[]");
+        const userExists = existingUsers.some((u: any) => u.email === signup.email);
+        
+        if (userExists) {
+          throw new Error("Já existe uma conta com este email");
+        }
+        
+        // Criar usuário offline
+        const userId = `offline-${Date.now()}`;
+        const newUser = {
+          id: userId,
+          name: signup.name,
+          email: signup.email,
+          cpf: signup.cpf,
+          password: signup.password, // Em produção, seria hash
+          phone: "",
+          avatar: null,
+        };
+        
+        existingUsers.push(newUser);
+        localStorage.setItem("offlineUsers", JSON.stringify(existingUsers));
+        localStorage.setItem("token", `offline-token-${userId}`);
+        localStorage.setItem("userData", JSON.stringify({
+          id: userId,
+          name: signup.name,
+          email: signup.email,
+          phone: "",
+          avatar: null,
+        }));
+        
+        setMensagem("✅ Conta criada localmente! (Modo Offline)");
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
 
-      const loginResponse = await loginUser({
-        email: signup.email,
-        password: signup.password,
-      });
-
-      localStorage.setItem("token", loginResponse.access_token);
-
-      // redirecionar para página principal após cadastro
+      // Redirecionar para página principal após cadastro
       router.push("/");
     } catch (err: any) {
-      console.error("Erro completo:", err);
+      console.error("❌ Erro ao criar conta:", err);
       
       let errorMessage = "Erro desconhecido ao criar conta";
       
@@ -95,24 +141,71 @@ export default function LoginSignUp() {
         errorMessage = err.message;
       }
       
-      setMensagem("Erro ao criar conta: " + errorMessage);
+      setMensagem("Erro: " + errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const handleSignin = async () => {
+    // Validações
+    if (!signin.email || !signin.password) {
+      setMensagem("Por favor, preencha todos os campos.");
+      return;
+    }
+
     try {
       setLoading(true);
       setMensagem("Entrando...");
 
-      const response = await loginUser(signin);
+      try {
+        // Tentar login no backend
+        const response = await loginUser(signin);
 
-      localStorage.setItem("token", response.access_token);
-      setMensagem("Login realizado com sucesso!");
+        localStorage.setItem("token", response.access_token);
+        
+        const userData = {
+          id: response.user_id || "local-user",
+          name: "",
+          email: signin.email,
+          phone: "",
+          avatar: null,
+        };
+        localStorage.setItem("userData", JSON.stringify(userData));
+        
+        setMensagem("✅ Login realizado com sucesso!");
+      } catch (backendErr: any) {
+        // Backend offline - modo offline
+        console.warn("⚠️ Backend offline, fazendo login localmente");
+        
+        // Buscar usuário offline
+        const offlineUsers = JSON.parse(localStorage.getItem("offlineUsers") || "[]");
+        const user = offlineUsers.find(
+          (u: any) => u.email === signin.email && u.password === signin.password
+        );
+        
+        if (!user) {
+          throw new Error("Email ou senha incorretos");
+        }
+        
+        // Login offline bem-sucedido
+        localStorage.setItem("token", `offline-token-${user.id}`);
+        localStorage.setItem("userData", JSON.stringify({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone || "",
+          avatar: user.avatar || null,
+        }));
+        
+        setMensagem("✅ Login realizado! (Modo Offline)");
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      
       router.push("/");
     } catch (err: any) {
-      setMensagem("Erro ao entrar: " + err.message);
+      console.error("❌ Erro ao fazer login:", err);
+      setMensagem("Erro: " + (err.message || "Falha ao entrar"));
     } finally {
       setLoading(false);
     }

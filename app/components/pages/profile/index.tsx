@@ -6,6 +6,8 @@ import {
   getCurrentUser,
   updateCurrentUser,
   getFields,
+  getUserReservations,
+  cancelReservation,
 } from "../../../utils/api";
 
 import Sidebar from "../../layout/sidebar";
@@ -14,11 +16,13 @@ import Avatar from "./avatar";
 import Title from "../../text/title";
 import Subtitle from "../../text/subtitle";
 import PrimaryButton from "../../button/primaryButton";
+import { Reservation } from "@/app/types/reservation";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [userFields, setUserFields] = useState<any[]>([]);
+  const [userReservations, setUserReservations] = useState<Reservation[]>([]);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -30,14 +34,30 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    
+    // Se não tem token, tentar pegar dados salvos
+    if (!token) {
+      const savedUser = localStorage.getItem("userData");
+      if (savedUser) {
+        const data = JSON.parse(savedUser);
+        setUser(data);
+        setName(data.name || "");
+        setEmail(data.email || "");
+        setPhone(data.phone || "");
+        setAvatarPreview(data.avatar || null);
+      }
+      setLoading(false);
+      return;
+    }
 
     (async () => {
       try {
         const data = await getCurrentUser(token);
+        console.log("✅ Dados do usuário carregados:", data);
+        
         setUser(data);
-        setName(data.name);
-        setEmail(data.email);
+        setName(data.name || "");
+        setEmail(data.email || "");
         setPhone(data.phone || "");
         setAvatarPreview(data.avatar || null);
         
@@ -45,33 +65,108 @@ export default function ProfilePage() {
         try {
           // Primeiro tenta buscar do backend
           const allFields = await getFields();
-          console.log("Campos do backend:", allFields);
+          console.log("✅ Campos do backend:", allFields);
+          
           // Filtrar campos criados pelo usuário
           const myFields = allFields.filter((field: any) => field.owner_id === data.id);
-          console.log("Campos filtrados do usuário:", myFields);
+          console.log("✅ Campos filtrados do usuário:", myFields);
           
           // Se não encontrou no backend, buscar do localStorage
           if (myFields.length === 0) {
             const localFields = JSON.parse(localStorage.getItem("localFields") || "[]");
-            console.log("Campos locais:", localFields);
+            console.log("📦 Usando campos locais:", localFields);
             setUserFields(localFields);
           } else {
             setUserFields(myFields);
           }
         } catch (err) {
-          console.warn("Erro ao buscar campos do backend:", err);
+          console.warn("⚠️ Erro ao buscar campos do backend:", err);
           // Se backend falhar, buscar do localStorage
           const localFields = JSON.parse(localStorage.getItem("localFields") || "[]");
-          console.log("Usando campos locais (backend falhou):", localFields);
+          console.log("📦 Usando campos locais (backend falhou):", localFields);
           setUserFields(localFields);
         }
       } catch (err) {
-        console.error("Erro ao carregar usuário:", err);
+        console.error("❌ Erro ao carregar usuário:", err);
+        
+        // Tentar carregar dados locais mesmo com erro
+        const savedUser = localStorage.getItem("userData");
+        if (savedUser) {
+          const data = JSON.parse(savedUser);
+          setUser(data);
+          setName(data.name || "");
+          setEmail(data.email || "");
+          setPhone(data.phone || "");
+          setAvatarPreview(data.avatar || null);
+        }
+        
+        // Carregar campos locais
+        const localFields = JSON.parse(localStorage.getItem("localFields") || "[]");
+        setUserFields(localFields);
       } finally {
         setLoading(false);
       }
     })();
+    
+    // Carregar reservas
+    loadReservations();
   }, []);
+  
+  // Função para carregar reservas
+  const loadReservations = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // Sem token, pegar do localStorage
+      const localReservations = JSON.parse(
+        localStorage.getItem("userReservations") || "[]"
+      );
+      setUserReservations(localReservations);
+      return;
+    }
+    
+    try {
+      const reservations = await getUserReservations(token);
+      setUserReservations(reservations);
+    } catch (err) {
+      console.error("❌ Erro ao carregar reservas:", err);
+      // Fallback para localStorage
+      const localReservations = JSON.parse(
+        localStorage.getItem("userReservations") || "[]"
+      );
+      setUserReservations(localReservations);
+    }
+  };
+  
+  // Função para cancelar reserva
+  const handleCancelReservation = async (reservationId: string) => {
+    if (!confirm("Deseja realmente cancelar esta reserva?")) {
+      return;
+    }
+    
+    const token = localStorage.getItem("token");
+    
+    try {
+      if (token) {
+        await cancelReservation(token, reservationId);
+      } else {
+        // Sem token, cancelar localmente
+        const localReservations = JSON.parse(
+          localStorage.getItem("userReservations") || "[]"
+        );
+        const updated = localReservations.map((r: Reservation) =>
+          r.id === reservationId ? { ...r, status: "cancelled" as const } : r
+        );
+        localStorage.setItem("userReservations", JSON.stringify(updated));
+      }
+      
+      // Recarregar reservas
+      await loadReservations();
+      alert("Reserva cancelada com sucesso!");
+    } catch (err) {
+      console.error("❌ Erro ao cancelar reserva:", err);
+      alert("Erro ao cancelar reserva. Tente novamente.");
+    }
+  };
 
   // máscara telefone
   function formatPhone(value: string) {
@@ -160,6 +255,95 @@ export default function ProfilePage() {
               onImageChange={handleAvatarFile}
             />
           </div>
+
+          {/* Minhas Reservas */}
+          <section className="mb-10">
+            <Title
+              firstLine="Minhas Reservas"
+              align="left"
+              size={28}
+              color="#1C1A0D"
+            />
+
+            <div className="mt-6 space-y-4">
+              {userReservations.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <p className="text-gray-500 text-lg">
+                    Você ainda não possui reservas
+                  </p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    Encontre campos disponíveis e faça sua primeira reserva!
+                  </p>
+                </div>
+              ) : (
+                userReservations
+                  .filter((reservation) => reservation.status === "confirmed")
+                  .map((reservation) => {
+                    const daysOfWeek: Record<string, string> = {
+                      monday: "Segunda-feira",
+                      tuesday: "Terça-feira",
+                      wednesday: "Quarta-feira",
+                      thursday: "Quinta-feira",
+                      friday: "Sexta-feira",
+                      saturday: "Sábado",
+                      sunday: "Domingo",
+                    };
+                    
+                    const formattedDate = new Date(reservation.date + "T00:00:00")
+                      .toLocaleDateString("pt-BR");
+
+                    return (
+                      <div
+                        key={reservation.id}
+                        className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                              {reservation.fieldName}
+                            </h3>
+                            
+                            <div className="space-y-1 text-gray-600">
+                              <p>
+                                <span className="font-medium">Data:</span>{" "}
+                                {formattedDate} ({daysOfWeek[reservation.dayOfWeek]})
+                              </p>
+                              <p>
+                                <span className="font-medium">Horário:</span>{" "}
+                                {reservation.startTime} - {reservation.endTime}
+                              </p>
+                              <p>
+                                <span className="font-medium">Valor:</span>{" "}
+                                <span className="text-[#EFA23B] font-semibold">
+                                  R$ {parseFloat(reservation.price).toFixed(2)}
+                                </span>
+                              </p>
+                            </div>
+                            
+                            <div className="mt-3">
+                              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                                Confirmada
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex sm:flex-col gap-2">
+                            <PrimaryButton
+                              label="Cancelar"
+                              onClick={() => handleCancelReservation(reservation.id)}
+                              className="w-full sm:w-32"
+                              color="#E53935"
+                              hoverColor="#C62828"
+                              textColor="white"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
+          </section>
 
           {/* Minhas Instalações */}
           <section className="mb-10">
