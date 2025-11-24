@@ -1,15 +1,8 @@
-// hooks/useRequireSportsCenter.ts
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getMySportsCenters } from '../utils/api';
 import toast from 'react-hot-toast';
 
-/**
- * Hook que verifica se o usuário tem um centro esportivo cadastrado.
- * Se não tiver, redireciona para a página de criar centro.
- * 
- * @returns {object} - { sportsCenterId, loading }
- */
 export function useRequireSportsCenter() {
   const router = useRouter();
   const [sportsCenterId, setSportsCenterId] = useState<number | null>(null);
@@ -49,10 +42,6 @@ export function useRequireSportsCenter() {
   return { sportsCenterId, loading };
 }
 
-/**
- * Função helper para obter o sports_center_id do usuário.
- * Retorna null e redireciona se não tiver centro.
- */
 export async function getSportsCenterIdOrRedirect(
   token: string,
   router: any
